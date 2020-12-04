@@ -1,0 +1,17 @@
+clear all;
+close all;
+clc;
+
+pc = pcread('rabbit.pcd');
+pc = pcdownsample(pc,'random',0.1);　　　%降低一下数据量
+pc_point = pc.Location';                %得到点云数据
+kdtree = vl_kdtreebuild(pc_point);      %使用vlfeat建立kdtree
+
+dissum = 0;
+for i=1:length(pc_point)    
+    p_cur = pc_point(:,i);
+    [index, distance] = vl_kdtreequery(kdtree, pc_point, p_cur, 'NumNeighbors',2);    %寻找当前点最近的非自身点
+    dissum = dissum + sqrt(distance(2));        %距离求和
+end
+
+avg = dissum / length(pc_point);
